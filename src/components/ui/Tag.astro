@@ -1,0 +1,30 @@
+---
+interface Props {
+  label: string;
+  active?: boolean;
+}
+
+const { label, active = false } = Astro.props;
+---
+
+<span class:list={['tag', { 'tag--active': active }]}>{label}</span>
+
+<style>
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    white-space: nowrap;
+    border: none;
+  }
+
+  .tag--active {
+    background: var(--color-accent);
+    color: white;
+  }
+</style>

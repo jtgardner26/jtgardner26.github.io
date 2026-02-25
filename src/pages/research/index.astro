@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import PaperCard from '../../components/ui/PaperCard.astro';
+import PaperFilter from '../../components/ui/PaperFilter.svelte';
+import sunsetCity from '../../assets/images/sunset-city.png';
+import { papers } from '../../data/papers';
+
+const sortedPapers = [...papers].sort((a, b) => a.order - b.order);
+const allTags = [...new Set(papers.flatMap(p => p.tags))].sort();
+---
+
+<BaseLayout title="Research" description="Research papers on organizational strategy, political dynamics, and competitive advantage.">
+  <section class="research-hero">
+    <div class="research-hero__bg">
+      <Image
+        src={sunsetCity}
+        alt=""
+        width={1800}
+        height={900}
+        class="research-hero__bg-img"
+      />
+    </div>
+    <div class="research-hero__overlay"></div>
+    <div class="container research-hero__inner">
+      <div class="section-header">
+        <span class="section-number" style="opacity: 0.4;">—</span>
+        <p class="label" style="color: rgba(255,255,255,0.7);">Research</p>
+      </div>
+      <h1 class="research-hero__heading">Research</h1>
+      <p class="research-hero__text">
+        My research explores ideology and politics in organizations, corporate socio-political positioning, network theory, and AI and ethical decision-making.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <PaperFilter
+        client:visible
+        papers={sortedPapers}
+        allTags={allTags}
+      />
+
+      <noscript>
+        <div class="papers-grid">
+          {sortedPapers.map(paper => (
+            <PaperCard paper={paper} />
+          ))}
+        </div>
+      </noscript>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .research-hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-5xl) 0 var(--space-3xl);
+  }
+
+  .research-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .research-hero :global(.research-hero__bg-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .research-hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to right, rgba(20, 35, 50, 0.88) 35%, rgba(20, 35, 50, 0.55) 100%),
+      linear-gradient(to bottom, transparent 60%, var(--color-bg) 100%);
+  }
+
+  .research-hero__inner {
+    position: relative;
+    z-index: 2;
+    max-width: var(--max-width-narrow);
+  }
+
+  .research-hero__heading {
+    color: #fff;
+    margin-bottom: var(--space-lg);
+  }
+
+  .research-hero__text {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: rgba(255, 255, 255, 0.75);
+    max-width: var(--max-width-text);
+  }
+</style>

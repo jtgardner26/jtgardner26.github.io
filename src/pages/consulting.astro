@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { services, approach } from '../data/consulting';
+---
+
+<BaseLayout title="Consulting" description="Strategy and AI consulting — evidence-based frameworks and modern AI implementation for organizational challenges.">
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="section-header">
+        <p class="label">Consulting</p>
+      </div>
+      <h1>Strategy & AI Consulting</h1>
+      <p class="page-intro">
+        I bring academic rigor to practical strategy challenges — and help organizations harness AI to accelerate their strategic goals. From competitive positioning to LLM implementation, I navigate both the human and technical dimensions of modern organizational challenges.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Services</h2>
+      <div class="services-grid">
+        {services.map(service => (
+          <div class="service-card card">
+            <span class="service-card__icon">{service.icon}</span>
+            <h3 class="service-card__title">{service.title}</h3>
+            <p class="service-card__desc">{service.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container container--narrow">
+      <h2>My Approach</h2>
+      <ul class="approach-list">
+        {approach.map(item => (
+          <li class="approach-item">
+            <span class="approach-dot"></span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="cta-card">
+        <h2>Let's Work Together</h2>
+        <p>Interested in bringing research-backed strategy insights to your organization? I'd love to discuss how I can help.</p>
+        <a href="mailto:jtgard@umich.edu" class="btn btn--primary">Get in Touch →</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-bottom: var(--space-md);
+  }
+
+  .page-intro {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+    max-width: var(--max-width-text);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+  }
+
+  .service-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .service-card__icon {
+    font-family: var(--font-mono);
+    font-size: var(--text-3xl);
+    color: var(--color-accent);
+    opacity: 0.3;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .service-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .service-card__desc {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+  }
+
+  .approach-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+
+  .approach-item {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    color: var(--color-text-muted);
+  }
+
+  .approach-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin-top: 0.6em;
+  }
+
+  .cta-card {
+    text-align: center;
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+  }
+
+  .cta-card h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .cta-card p {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xl);
+    max-width: 28rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>

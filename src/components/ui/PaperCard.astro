@@ -1,0 +1,90 @@
+---
+import type { Paper } from '../../data/papers';
+import Tag from './Tag.astro';
+
+interface Props {
+  paper: Paper;
+}
+
+const { paper } = Astro.props;
+---
+
+<article class="paper-card card">
+  <div class="paper-card__header">
+    <span class="label">{paper.status}</span>
+    {paper.has_scrollytelling && <span class="paper-card__badge">Interactive</span>}
+  </div>
+  <h3 class="paper-card__title">
+    <a href={`/research/${paper.slug}`}>{paper.title}</a>
+  </h3>
+  <p class="paper-card__authors">{paper.authors.join(', ')}</p>
+  <p class="paper-card__abstract">{paper.abstract}</p>
+  <div class="paper-card__tags">
+    {paper.tags.map(tag => <Tag label={tag} />)}
+  </div>
+</article>
+
+<style>
+  .paper-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .paper-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .paper-card__badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: linear-gradient(135deg, var(--color-accent-light), rgba(91, 130, 168, 0.2));
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    letter-spacing: var(--tracking-wide);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase;
+  }
+
+  .paper-card__title {
+    font-size: var(--text-xl);
+    margin-top: var(--space-xs);
+  }
+
+  .paper-card__title a {
+    text-decoration: none;
+    color: var(--color-text);
+    transition: color var(--transition-fast);
+  }
+
+  .paper-card__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .paper-card__authors {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .paper-card__abstract {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .paper-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: auto;
+    padding-top: var(--space-sm);
+  }
+</style>

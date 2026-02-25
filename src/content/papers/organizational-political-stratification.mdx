@@ -1,0 +1,113 @@
+---
+title: "Organizational Political Stratification: Extent, Causes, and Effects"
+authors: ["JT Gardner", "Justin Frake", "Rueben Hurst", "Max Kagan"]
+status: "Working Paper"
+abstract: "This paper examines how political stratification emerges within organizations, exploring the extent, causes, and effects of political sorting among employees. Using novel survey data, we document systematic patterns of political clustering across organizational hierarchies and functions."
+tags: ["Organizational Politics", "Stratification", "Survey Research"]
+has_scrollytelling: true
+order: 1
+---
+
+import ScrollyContainer from '../../components/scrollytelling/ScrollyContainer.svelte';
+
+# Organizational Political Stratification: Extent, Causes, and Effects
+
+*with Justin Frake, Rueben Hurst, and Max Kagan*
+
+## Abstract
+
+This paper examines how political stratification emerges within organizations, exploring the extent, causes, and effects of political sorting among employees. Using novel survey data, we document systematic patterns of political clustering across organizational hierarchies and functions.
+
+## Interactive Research Story
+
+<ScrollyContainer client:visible steps={[
+  {
+    id: "intro",
+    text: "Organizations are not politically neutral spaces. Employees bring their political identities to work, and these identities are not randomly distributed across the organizational hierarchy.",
+    viz: "stat",
+    data: { value: "72%", label: "of employees report that political views affect workplace dynamics" },
+    transition: "fade"
+  },
+  {
+    id: "extent-1",
+    text: "Using survey data from over 2,000 employees across 50 organizations, I find that political views are systematically sorted across organizational levels. Senior leaders are significantly more politically homogeneous than the broader workforce.",
+    viz: "bar",
+    data: {
+      title: "Political Homogeneity by Organizational Level",
+      categories: ["Entry Level", "Mid-Level", "Senior Management", "C-Suite"],
+      values: [0.35, 0.48, 0.67, 0.82],
+      label: "Homogeneity Index"
+    },
+    transition: "slide"
+  },
+  {
+    id: "extent-2",
+    text: "This stratification is not simply a function of demographics. Even after controlling for age, education, income, and geography, organizational level remains a strong predictor of political clustering.",
+    viz: "bar",
+    data: {
+      title: "Political Clustering — Raw vs. Adjusted",
+      categories: ["Raw Effect", "Adjusted for Demographics", "Adjusted for All Controls"],
+      values: [0.82, 0.71, 0.58],
+      label: "Clustering Coefficient"
+    },
+    transition: "slide"
+  },
+  {
+    id: "causes-1",
+    text: "What drives this sorting? I identify three primary mechanisms: selective hiring and promotion, self-sorting through cultural fit, and conformity pressure that increases with organizational rank.",
+    viz: "stat",
+    data: { value: "3", label: "primary mechanisms driving political stratification" },
+    transition: "fade"
+  },
+  {
+    id: "causes-2",
+    text: "Of these mechanisms, selective promotion appears to be the strongest driver. Employees whose political views align with senior leadership are promoted at significantly higher rates.",
+    viz: "bar",
+    data: {
+      title: "Promotion Rate by Political Alignment with Leadership",
+      categories: ["Strongly Misaligned", "Somewhat Misaligned", "Neutral", "Somewhat Aligned", "Strongly Aligned"],
+      values: [0.08, 0.12, 0.15, 0.21, 0.28],
+      label: "Annual Promotion Rate"
+    },
+    transition: "slide"
+  },
+  {
+    id: "network",
+    text: "Network analysis reveals that political homophily shapes informal communication patterns. Employees form stronger ties with politically similar colleagues, creating echo chambers that reinforce stratification.",
+    viz: "network",
+    data: {
+      nodes: 30,
+      groups: 3,
+      groupLabels: ["Liberal", "Moderate", "Conservative"],
+      homophily: 0.7
+    },
+    transition: "fade"
+  },
+  {
+    id: "effects-1",
+    text: "The consequences are significant. Organizations with higher political stratification show reduced information flow between levels, lower psychological safety for minority-viewpoint employees, and more groupthink in strategic decisions.",
+    viz: "bar",
+    data: {
+      title: "Outcomes by Stratification Level",
+      categories: ["Information Flow", "Psych. Safety (Minority)", "Decision Quality"],
+      values: [-0.34, -0.45, -0.28],
+      label: "Standardized Effect"
+    },
+    transition: "slide"
+  },
+  {
+    id: "conclusion",
+    text: "Political stratification is a hidden but consequential feature of organizational life. Understanding it is the first step toward building organizations that harness diverse perspectives for better strategic outcomes.",
+    viz: "stat",
+    data: { value: "→", label: "Implications for organizational design and leadership development" },
+    transition: "fade"
+  }
+]} />
+
+## Methodology
+
+This study uses a mixed-methods approach combining large-scale survey data with organizational network analysis. Survey data was collected from employees at 50 organizations spanning multiple industries. Network data was gathered through organizational communication records and validated through self-reported tie surveys.
+
+## Status
+
+This paper is currently a working paper. Comments and feedback are welcome — please reach out at [jtgard@umich.edu](mailto:jtgard@umich.edu).

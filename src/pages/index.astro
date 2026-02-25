@@ -1,0 +1,413 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import headshot from '../assets/images/headshot.jpg';
+import heroGeo from '../assets/images/hero-geo.png';
+import vistaCity from '../assets/images/vista-city.png';
+import { papers } from '../data/papers';
+import PaperCard from '../components/ui/PaperCard.astro';
+
+const featuredPapers = papers.filter(p => p.order <= 3);
+---
+
+<BaseLayout title="Home" description="JT Gardner — Strategy PhD student at Ross School of Business, University of Michigan. Research on ideology in organizations, socio-political positioning, and AI ethics.">
+
+  <!-- Fixed art — stays in place while you scroll through hero + about -->
+  <div class="art-track" aria-hidden="true">
+    <Image
+      src={heroGeo}
+      alt=""
+      width={1800}
+      height={1200}
+      class="art-track__img"
+      loading="eager"
+    />
+    <div class="art-track__fade"></div>
+  </div>
+
+  <!-- HERO — text left, headshot right, everything in viewport -->
+  <section class="hero">
+    <div class="hero__inner container">
+      <div class="hero__text">
+        <p class="label">Strategy · Research · AI Consulting</p>
+        <h1 class="hero__heading">JT Gardner</h1>
+        <p class="hero__sub">
+          PhD student in Strategy at the <strong>Ross School of Business</strong>, University of Michigan. I study ideology and politics in organizations, corporate socio-political positioning, and AI and ethical decision-making.
+        </p>
+        <div class="hero__actions">
+          <a href="/research" class="btn btn--primary">View Research</a>
+          <a href="/consulting" class="btn">Consulting</a>
+        </div>
+      </div>
+      <div class="hero__image-wrap">
+        <Image
+          src={headshot}
+          alt="JT Gardner headshot"
+          width={500}
+          height={500}
+          class="hero__image"
+        />
+      </div>
+    </div>
+    <div class="hero__scroll-hint">
+      <span>Scroll</span>
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+        <path d="M8 4V18M8 18L2 12M8 18L14 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ABOUT — transparent bg so art peeks through -->
+  <section class="section section--transparent" id="about">
+    <div class="container container--narrow">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <p class="label">About</p>
+      </div>
+      <h2>Bridging Research<br/>and Practice</h2>
+      <p class="about__text">
+        I'm a Strategy PhD student at the Ross School of Business, University of Michigan. My research focuses on ideology and politics in organizations, corporate socio-political positioning, network theory, and AI and ethical decision-making.
+      </p>
+      <p class="about__text">
+        Before starting my PhD, I studied International Relations at Brigham Young University, where I was a Wheatley Scholar and worked as a research assistant in the Purpose Lab and Global Politics Lab. I also consult with organizations on strategy development and AI implementation.
+      </p>
+    </div>
+  </section>
+
+  <!-- Solid bg from here — covers the fixed art underneath -->
+  <div class="solid-bg">
+    <section class="section" id="research-preview">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-number">02</span>
+          <p class="label">Research</p>
+        </div>
+        <h2>Current Work</h2>
+        <div class="papers-grid">
+          {featuredPapers.map(paper => (
+            <PaperCard paper={paper} />
+          ))}
+        </div>
+        <div class="section-cta">
+          <a href="/research" class="btn">All Research →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section consulting-teaser" id="consulting-preview">
+      <div class="consulting-teaser__bg">
+        <Image
+          src={vistaCity}
+          alt=""
+          width={1800}
+          height={900}
+          class="consulting-teaser__bg-img"
+        />
+      </div>
+      <div class="consulting-teaser__overlay"></div>
+      <div class="container consulting-teaser__inner">
+        <div class="section-header">
+          <span class="section-number" style="opacity: 0.4;">03</span>
+          <p class="label" style="color: rgba(255,255,255,0.7);">Consulting</p>
+        </div>
+        <h2 class="consulting-teaser__heading">Strategy & AI Consulting</h2>
+        <p class="consulting-teaser__text">
+          From competitive positioning to AI implementation, I help organizations make better strategic decisions — grounded in academic research and delivered with practical clarity.
+        </p>
+        <div class="section-cta">
+          <a href="/consulting" class="btn btn--primary">Learn More →</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</BaseLayout>
+
+<style>
+  /* ===================
+     FIXED ART LAYER
+     =================== */
+  .art-track {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .art-track :global(.art-track__img) {
+    position: absolute;
+    top: -5%;
+    right: -15%;
+    left: auto;
+    width: 65%;
+    height: 110%;
+    object-fit: cover;
+    object-position: left center;
+    transform: scaleX(-1);
+    opacity: 0.7;
+  }
+
+  .art-track__fade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right, var(--color-bg) 20%, rgba(244,246,249,0.3) 60%, transparent 100%),
+      linear-gradient(to bottom, transparent 55%, var(--color-bg) 100%),
+      linear-gradient(to top, transparent 80%, rgba(244,246,249,0.4) 100%);
+  }
+
+  /* ===================
+     HERO
+     =================== */
+  .hero {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+
+  .hero__text {
+    max-width: 38rem;
+  }
+
+  .hero__heading {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin: var(--space-sm) 0 var(--space-xl);
+  }
+
+  .hero__sub {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+  }
+
+  .hero__sub strong {
+    color: var(--color-text);
+  }
+
+  .hero__actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-2xl);
+  }
+
+  .hero__image-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero__image {
+    width: 280px !important;
+    height: 280px !important;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 8px 40px rgba(30, 58, 74, 0.12),
+      0 0 0 4px rgba(255, 255, 255, 0.7);
+  }
+
+  .hero__scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ===================
+     TRANSPARENT SECTION (art shows through)
+     =================== */
+  .section--transparent {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===================
+     SOLID BG (covers art)
+     =================== */
+  .solid-bg {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+  }
+
+  /* ===================
+     SHARED SECTION STYLES
+     =================== */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .section h2 {
+    margin-bottom: var(--space-xl);
+  }
+
+  .about__text {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    max-width: var(--max-width-text);
+    color: var(--color-text-muted);
+  }
+
+  .papers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+  }
+
+  .section-cta {
+    margin-top: var(--space-2xl);
+  }
+
+  /* ===================
+     CONSULTING TEASER
+     =================== */
+  .consulting-teaser {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-5xl) 0;
+  }
+
+  .consulting-teaser__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .consulting-teaser :global(.consulting-teaser__bg-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .consulting-teaser__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to right, rgba(20, 40, 55, 0.85) 40%, rgba(20, 40, 55, 0.5) 100%);
+  }
+
+  .consulting-teaser__inner {
+    position: relative;
+    z-index: 2;
+    max-width: var(--max-width-narrow);
+  }
+
+  .consulting-teaser__heading {
+    color: #fff;
+    margin-bottom: var(--space-lg);
+  }
+
+  .consulting-teaser__text {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: rgba(255, 255, 255, 0.75);
+    max-width: var(--max-width-text);
+  }
+
+  /* ===================
+     MOBILE
+     =================== */
+  @media (max-width: 768px) {
+    .art-track :global(.art-track__img) {
+      width: 100%;
+      opacity: 0.25;
+    }
+
+    .art-track__fade {
+      background:
+        linear-gradient(to left, var(--color-bg) 10%, transparent 50%),
+        linear-gradient(to bottom, transparent 40%, var(--color-bg) 100%);
+    }
+
+    .hero {
+      height: auto;
+      min-height: 100vh;
+      padding-top: 5.5rem;
+    }
+
+    .hero__inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: var(--space-xl);
+    }
+
+    .hero__image-wrap {
+      order: -1;
+    }
+
+    .hero__image {
+      width: 200px !important;
+      height: 200px !important;
+    }
+
+    .hero__text {
+      max-width: none;
+    }
+
+    .hero__sub {
+      margin: 0 auto;
+    }
+
+    .hero__actions {
+      justify-content: center;
+    }
+
+    .hero__scroll-hint {
+      display: none;
+    }
+
+    .section-header {
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .hero__inner {
+      grid-template-columns: 1fr 220px;
+    }
+
+    .hero__image {
+      width: 220px !important;
+      height: 220px !important;
+    }
+  }
+</style>

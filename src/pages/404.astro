@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import sunsetCity from '../assets/images/sunset-city.png';
+---
+
+<BaseLayout title="404 — Page Not Found">
+  <section class="error-page">
+    <div class="error-bg">
+      <Image src={sunsetCity} alt="" widths={[800, 1200, 1800]} class="error-bg__img" />
+    </div>
+    <div class="error-overlay"></div>
+    <div class="container error-content">
+      <span class="error-number">404</span>
+      <h1>Page Not Found</h1>
+      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <a href="/" class="btn btn--primary">Back to Home →</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error-page {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .error-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .error-bg__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+  }
+
+  .error-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to bottom, var(--color-bg), transparent 30%, transparent 70%, var(--color-bg));
+  }
+
+  .error-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .error-number {
+    font-family: var(--font-mono);
+    font-size: 8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .error-page h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .error-page p {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    max-width: 24rem;
+  }
+
+  .error-page .btn {
+    margin-top: var(--space-md);
+  }
+</style>

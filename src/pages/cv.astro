@@ -1,0 +1,271 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import cvData from '../data/cv.json';
+---
+
+<BaseLayout title="CV" description="Academic CV — education, research, teaching, and professional experience.">
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="section-header">
+        <p class="label">Curriculum Vitae</p>
+      </div>
+      <h1>{cvData.name}</h1>
+      <p class="cv-subtitle">{cvData.title} · {cvData.institution}</p>
+      <p class="cv-contact"><a href={`mailto:${cvData.email}`}>{cvData.email}</a> · {cvData.phone}</p>
+      <div class="cv-download">
+        <a href="/JT_Gardner_Academic_CV.pdf" class="btn" target="_blank" rel="noopener">
+          Download PDF →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Interests -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Research Interests</h2>
+      <p class="cv-interests">{cvData.researchInterests}</p>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Education</h2>
+      <div class="cv-entries">
+        {cvData.education.map(edu => (
+          <div class="cv-entry">
+            <div class="cv-entry__header">
+              <h3 class="cv-entry__title">{edu.degree}</h3>
+              <span class="cv-entry__years">{edu.years}</span>
+            </div>
+            <p class="cv-entry__institution">{edu.institution}</p>
+            {edu.details && <p class="cv-entry__details">{edu.details}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Working Papers -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Working Papers</h2>
+      <div class="cv-entries">
+        {cvData.research.map(paper => (
+          <div class="cv-entry">
+            <h3 class="cv-entry__title">{paper.title}</h3>
+            <p class="cv-entry__details">
+              {paper.coauthors.length > 0
+                ? `with ${paper.coauthors.join(', ')}. `
+                : 'Solo-authored. '}
+              <em>{paper.status}.</em>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Conference Presentations -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Conference Presentations</h2>
+      <div class="cv-entries">
+        {cvData.conferencePresentations.map(pres => (
+          <div class="cv-entry">
+            <h3 class="cv-entry__title">"{pres.title}"</h3>
+            <p class="cv-entry__details">{pres.venue}, {pres.location}, {pres.year}.</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaching -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Teaching Experience</h2>
+      <div class="cv-entries">
+        {cvData.teaching.map(t => (
+          <div class="cv-entry">
+            <div class="cv-entry__header">
+              <h3 class="cv-entry__title">{t.course}</h3>
+              <span class="cv-entry__years">{t.years}</span>
+            </div>
+            <p class="cv-entry__institution">{t.role} · {t.institution} ({t.professor})</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Experience -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Research Experience</h2>
+      <div class="cv-entries">
+        {cvData.researchExperience.map(exp => (
+          <div class="cv-entry">
+            <div class="cv-entry__header">
+              <h3 class="cv-entry__title">{exp.role}</h3>
+              <span class="cv-entry__years">{exp.years}</span>
+            </div>
+            <p class="cv-entry__institution">{exp.lab}, {exp.department}, {exp.institution}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Awards -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Awards & Honors</h2>
+      <div class="cv-entries">
+        {cvData.awards.map(award => (
+          <div class="cv-entry">
+            <div class="cv-entry__header">
+              <h3 class="cv-entry__title">{award.title}</h3>
+              <span class="cv-entry__years">{award.years}</span>
+            </div>
+            <p class="cv-entry__institution">{award.institution}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="cv-section-title">Technical Skills & Methods</h2>
+      <div class="cv-skills-group">
+        <div class="cv-skills-category">
+          <h3 class="cv-skills-label">Programming</h3>
+          <div class="cv-skills">
+            {cvData.skills.programming.map(skill => (
+              <span class="cv-skill">{skill}</span>
+            ))}
+          </div>
+        </div>
+        <div class="cv-skills-category">
+          <h3 class="cv-skills-label">Data & Computing</h3>
+          <div class="cv-skills">
+            {cvData.skills.dataAndComputing.map(skill => (
+              <span class="cv-skill">{skill}</span>
+            ))}
+          </div>
+        </div>
+        <div class="cv-skills-category">
+          <h3 class="cv-skills-label">Methods</h3>
+          <div class="cv-skills">
+            {cvData.skills.methods.map(skill => (
+              <span class="cv-skill">{skill}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-bottom: var(--space-xs);
+  }
+
+  .cv-subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+
+  .cv-contact {
+    margin-top: var(--space-xs);
+    color: var(--color-text-muted);
+  }
+
+  .cv-download {
+    margin-top: var(--space-xl);
+  }
+
+  .cv-interests {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+  }
+
+  .cv-section-title {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border-hover);
+  }
+
+  .cv-entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .cv-entry__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .cv-entry__title {
+    font-size: var(--text-lg);
+  }
+
+  .cv-entry__years {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    letter-spacing: var(--tracking-wide);
+    flex-shrink: 0;
+  }
+
+  .cv-entry__institution {
+    color: var(--color-text-muted);
+    margin-top: var(--space-xs);
+  }
+
+  .cv-entry__details {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-xs);
+  }
+
+  .cv-skills-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .cv-skills-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  .cv-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .cv-skill {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    padding: 6px var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+  }
+</style>

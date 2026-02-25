@@ -1,0 +1,99 @@
+{
+  "name": "JT Gardner",
+  "title": "PhD Student in Strategy",
+  "institution": "Ross School of Business, University of Michigan",
+  "email": "jtgard@umich.edu",
+  "phone": "(801) 361-2637",
+  "researchInterests": "Ideology and politics in organizations, corporate socio-political positioning, network theory, AI and ethical decision-making",
+  "education": [
+    {
+      "degree": "Ph.D., Business Administration (Strategy)",
+      "institution": "University of Michigan, Ross School of Business",
+      "years": "2024 – 2030 (Expected)",
+      "details": ""
+    },
+    {
+      "degree": "B.A., International Relations",
+      "institution": "Brigham Young University",
+      "years": "2024",
+      "details": ""
+    }
+  ],
+  "research": [
+    {
+      "title": "Organizational Political Stratification: Extent, Causes, and Effects",
+      "status": "Working paper",
+      "coauthors": ["Justin Frake", "Rueben Hurst", "Max Kagan"]
+    },
+    {
+      "title": "When Voice Matters More: Voice Climate, Psychological Safety, and Innovation in Technology-Intensive Industries",
+      "status": "Preparing for submission to Academy of Management Journal",
+      "coauthors": ["Taeya Howell", "Jeff Dyer"]
+    },
+    {
+      "title": "Robust Actions in Socio-Political Positioning",
+      "status": "Working paper",
+      "coauthors": ["Haram Seo", "Alessandro Piazza"]
+    },
+    {
+      "title": "Guns or Galleries: Robust Brokers and Structural Barriers",
+      "status": "In preparation",
+      "coauthors": []
+    },
+    {
+      "title": "AI-Mediated Communication and Ethical Decision-Making",
+      "status": "In preparation",
+      "coauthors": []
+    },
+    {
+      "title": "A Dynamic Model of Socio-Political Positioning",
+      "status": "In preparation",
+      "coauthors": ["Aseem Kaul"]
+    }
+  ],
+  "conferencePresentations": [
+    {
+      "title": "When Voice Matters More: Voice Climate, Psychological Safety, and Innovation in Technology-Intensive Industries",
+      "venue": "Academy of Management Annual Meeting",
+      "location": "Copenhagen, Denmark",
+      "year": "2025"
+    }
+  ],
+  "teaching": [
+    {
+      "course": "STRAT 699: AI and Strategy",
+      "role": "Graduate Student Instructor",
+      "institution": "Ross School of Business",
+      "professor": "Prof. Felipe Csaszar",
+      "years": "Fall 2025"
+    }
+  ],
+  "researchExperience": [
+    {
+      "role": "Research Assistant",
+      "lab": "Purpose Lab",
+      "department": "Department of Management",
+      "institution": "Brigham Young University",
+      "years": "2022 – 2024"
+    },
+    {
+      "role": "Research Assistant",
+      "lab": "Global Politics Lab",
+      "department": "Department of Political Science",
+      "institution": "Brigham Young University",
+      "years": "2022 – 2023"
+    }
+  ],
+  "awards": [
+    {
+      "title": "Wheatley Scholar",
+      "institution": "Brigham Young University",
+      "years": "2023 – 2024"
+    }
+  ],
+  "skills": {
+    "programming": ["Python", "R"],
+    "dataAndComputing": ["Large language models for data extraction (SEC 10-K filings)", "University of Michigan Great Lakes HPC cluster", "Compustat", "Entity resolution", "Network analysis"],
+    "methods": ["Experimental design", "Causal inference", "Network analysis", "Natural language processing", "Computational text analysis"]
+  }
+}

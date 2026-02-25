@@ -1,0 +1,106 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Tag from '../components/ui/Tag.astro';
+
+interface Props {
+  title: string;
+  authors: string[];
+  status: string;
+  abstract: string;
+  tags: string[];
+}
+
+const { title, authors, status, abstract, tags } = Astro.props;
+---
+
+<BaseLayout title={title} description={abstract}>
+  <article class="paper-page">
+    <header class="paper-header section">
+      <div class="container container--narrow">
+        <a href="/research" class="paper-back label">← Back to Research</a>
+        <span class="label paper-status">{status}</span>
+        <h1>{title}</h1>
+        <p class="paper-authors">{authors.join(', ')}</p>
+        <div class="paper-tags">
+          {tags.map(tag => <Tag label={tag} />)}
+        </div>
+      </div>
+    </header>
+    <div class="paper-body container container--narrow">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .paper-back {
+    display: inline-block;
+    margin-bottom: var(--space-lg);
+    text-decoration: none;
+    color: var(--color-text-muted);
+  }
+
+  .paper-back:hover {
+    color: var(--color-accent);
+  }
+
+  .paper-status {
+    display: inline-block;
+    margin-bottom: var(--space-sm);
+    color: var(--color-secondary);
+  }
+
+  .paper-header h1 {
+    margin-bottom: var(--space-sm);
+  }
+
+  .paper-authors {
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .paper-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .paper-body {
+    padding-bottom: var(--space-5xl);
+  }
+
+  .paper-body :global(h2) {
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .paper-body :global(h3) {
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-sm);
+  }
+
+  .paper-body :global(p) {
+    line-height: var(--leading-relaxed);
+  }
+
+  .paper-body :global(ul),
+  .paper-body :global(ol) {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-xl);
+  }
+
+  .paper-body :global(li) {
+    margin-bottom: var(--space-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .paper-body :global(strong) {
+    font-weight: 600;
+  }
+
+  .paper-body :global(a) {
+    color: var(--color-accent);
+  }
+</style>
