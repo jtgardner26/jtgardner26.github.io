@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guns or Galleries: The Partisan Supply Chain</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --dem:#2166ac; --dem-light:#67a9cf; --rep:#b2182b; --rep-light:#ef8a62;
+    --bg:#08080c; --surface:#0e0e14; --border:#1a1a25;
+    --text:#e8e4df; --text-dim:#8a8580; --text-mid:#b5b0ab;
+  }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
+
+  /* ── TITLE PAGE ── */
+  .title-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .title-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, rgba(33,102,172,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 55% 45%, rgba(178,24,43,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .title-page h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(48px, 7vw, 88px);
+    color: #f5f0eb;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .title-page .subtitle {
+    font-size: clamp(14px, 1.8vw, 18px);
+    color: var(--text-dim);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .title-page .author {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 20px;
+    position: relative;
+  }
+  .scroll-cue {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .scroll-cue span {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .scroll-cue .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 1.5px solid var(--text-dim);
+    border-bottom: 1.5px solid var(--text-dim);
+    transform: rotate(45deg);
+    margin-top: -4px;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+
+  /* ── NETWORK SCROLL ── */
+  .scroll-container { position:relative; }
+  .canvas-sticky {
+    position:sticky; top:0; height:100vh; width:100%; z-index:1; overflow:hidden;
+  }
+  canvas#net { width:100%; height:100%; display:block; }
+
+  .scroll-spacer { position:relative; z-index:0; pointer-events:none; }
+  .scroll-section { height:100vh; pointer-events:auto; }
+
+  /* ── BOTTOM CAPTIONS ── */
+  .caption-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    pointer-events: none;
+    padding: 32px 5%;
+  }
+  .caption {
+    position: absolute;
+    top: 32px;
+    left: 5%;
+    max-width: 480px;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+  }
+  .caption.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .caption-bg {
+    background: linear-gradient(to right, rgba(8,8,12,0.88) 0%, rgba(8,8,12,0.6) 80%, transparent 100%);
+    padding: 24px 36px 24px 0;
+  }
+  .caption h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    color: #f5f0eb;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+  }
+  .caption p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text-mid);
+  }
+  .caption .stat-inline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: #f5f0eb;
+    font-style: italic;
+  }
+  .caption .hl-b { color: var(--dem-light); font-weight:500; }
+  .caption .hl-r { color: var(--rep-light); font-weight:500; }
+  .caption .hl-w { color: #f5f0eb; font-weight:500; }
+
+  /* ── LEGEND ── */
+  .legend-float {
+    position:fixed; top:16px; right:20px;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(8,8,12,0.85); padding:6px 14px; border-radius:3px;
+    border:1px solid var(--border); z-index:50;
+    opacity:0; transition:opacity 0.6s ease; pointer-events:none;
+  }
+  .legend-float.show { opacity:1; }
+  .legend-grad {
+    width:120px; height:10px; border-radius:2px;
+    background:linear-gradient(to right,#2166ac,#67a9cf,#ebebE6,#ef8a62,#b2182b);
+  }
+  .legend-lbl { font-size:10px; color:var(--text-dim); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position:fixed; background:rgba(12,12,18,0.95); border:1px solid #2a2a35;
+    padding:8px 12px; border-radius:3px; font-size:12px;
+    pointer-events:none; display:none; z-index:200;
+  }
+  .tooltip .name { font-family:'Instrument Serif',serif; font-size:15px; color:#f5f0eb; }
+  .tooltip .detail { color:var(--text-dim); line-height:1.5; margin-top:2px; }
+
+  /* ── 2x2 FRAMEWORK ── */
+  .framework-section {
+    position: relative; z-index: 10; background: var(--bg);
+    padding: 80px 5% 60px;
+  }
+  .framework-section .section-title {
+    font-family: 'Instrument Serif', serif; font-size: 36px;
+    text-align: center; color: #f5f0eb; margin-bottom: 4px;
+  }
+  .framework-section .section-sub {
+    font-size: 14px; color: var(--text-dim); text-align: center;
+    margin-bottom: 32px; font-weight: 300;
+  }
+  .fw-grid {
+    display: grid; grid-template-columns: 48px 1fr 1fr;
+    grid-template-rows: 44px 1fr 1fr; gap: 12px;
+    max-width: 860px; margin: 0 auto;
+  }
+  .fw-col-header {
+    grid-column: 2/4; grid-row: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .fw-axis-label {
+    font-size: 12px; font-weight: 500; color: var(--text-mid);
+    letter-spacing: 1.2px; text-transform: uppercase;
+  }
+  .fw-col-labels {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    width: 100%; text-align: center;
+  }
+  .fw-col-lbl { font-size: 11px; color: var(--text-dim); }
+  .fw-row-header {
+    grid-column: 1; grid-row: 2/4;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fw-row-inner {
+    transform: rotate(-90deg); white-space: nowrap;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .fw-row-labels { display: flex; gap: 60px; font-size: 11px; color: var(--text-dim); }
+  .fw-cell {
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 16px 18px 14px;
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(14,14,20,0.4);
+  }
+  .fw-cell-label {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px; color: #f5f0eb; margin-bottom: 2px; text-align: center;
+  }
+  .fw-cell-desc {
+    font-size: 11px; color: var(--text-dim); text-align: center;
+    margin-bottom: 10px; line-height: 1.5; font-style: italic;
+  }
+  .fw-cell-pred {
+    margin-top: 8px; font-size: 11px; color: var(--text-mid);
+    text-align: center; line-height: 1.55;
+  }
+  .fw-pred-key {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px; font-style: italic;
+  }
+  .fw-pred-pos { color: #67d49e; }
+  .fw-pred-neg { color: var(--rep-light); }
+  .fw-pred-null { color: var(--text-dim); }
+  .fw-legend {
+    display: flex; justify-content: center; align-items: center;
+    gap: 18px; margin-top: 22px; flex-wrap: wrap;
+  }
+  .fw-leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+  .fw-leg-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .fw-leg-dot.broker { border: 2px solid #f5f0eb; }
+
+  /* ── STATS SECTION ── */
+  .stats-section {
+    position:relative; z-index:10; background:var(--bg); padding:80px 5% 100px;
+  }
+  .stats-section .section-title {
+    font-family:'Instrument Serif',serif; font-size:36px; text-align:center; color:#f5f0eb; margin-bottom:8px;
+  }
+  .stats-section .section-sub {
+    font-size:14px; color:var(--text-dim); text-align:center; margin-bottom:48px; font-weight:300;
+  }
+  .panels-row { display:flex; gap:24px; justify-content:center; align-items:flex-start; flex-wrap:wrap; }
+  .stat-panel { text-align:center; }
+  .stat-panel .panel-title { font-family:'Instrument Serif',serif; font-size:18px; color:#f5f0eb; margin-bottom:4px; }
+  .stat-panel .panel-sub { font-size:12px; color:var(--text-dim); margin-bottom:10px; }
+  .stat-panel canvas { display:block; margin:0 auto; }
+  .stat-panel .panel-result { font-size:12px; color:var(--text-dim); margin-top:8px; }
+  .stat-panel .panel-result .coeff { font-weight:600; color:#f5f0eb; }
+  .panel-divider { width:1px; height:360px; background:var(--border); align-self:center; flex-shrink:0; }
+  .finding-box {
+    margin:40px auto 0; max-width:720px; text-align:center;
+    padding:20px 28px; border:1px solid var(--border); border-radius:4px; background:rgba(14,14,20,0.5);
+  }
+  .finding-box p { font-size:15px; line-height:1.7; color:var(--text-mid); }
+  .finding-box .key { font-family:'Instrument Serif',serif; font-size:18px; color:#f5f0eb; font-style:italic; }
+  .pill-row { display:flex; justify-content:center; gap:16px; margin-bottom:48px; flex-wrap:wrap; }
+  .pill { background:var(--surface); border:1px solid var(--border); padding:8px 18px; border-radius:3px; text-align:center; }
+  .pill .val { font-family:'Instrument Serif',serif; font-size:24px; color:#f5f0eb; }
+  .pill .lbl { font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px; margin-top:2px; }
+</style>
+</head>
+<body>
+
+<!-- TITLE PAGE -->
+<div class="title-page">
+  <h1>Guns or Galleries</h1>
+  <div class="subtitle">Robust Brokers and Polarized Structural Holes in American Supply Chains</div>
+  <div class="author">JT Gardner</div>
+  <div class="scroll-cue"><span>Scroll</span><div class="arrow"></div></div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend-float" id="legend">
+  <span class="legend-lbl">Dem</span>
+  <div class="legend-grad"></div>
+  <span class="legend-lbl">Rep</span>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"><div class="name"></div><div class="detail"></div></div>
+
+<!-- CAPTION LAYER (fixed, dissolves in/out per stage) -->
+<div class="caption-layer" id="captionLayer">
+  <div class="caption" data-cap="0">
+    <div class="caption-bg">
+      <h2>The U.S. Supply Chain</h2>
+      <p>300 of the most connected firms in America. Each dot is a company. Each line is a supply chain relationship extracted from SEC 10-K filings: buyers, suppliers, distributors, and partners.</p>
+    </div>
+  </div>
+  <div class="caption" data-cap="1">
+    <div class="caption-bg">
+      <h2>Who Leans <span class="hl-b">Democrat</span>?</h2>
+      <p>Using voter registration records from 250 million Americans, we measure the partisan composition of each company's workforce. <span class="hl-b">Bluer firms</span> employ more registered Democrats.</p>
+    </div>
+  </div>
+  <div class="caption" data-cap="2">
+    <div class="caption-bg">
+      <h2>Who Leans <span class="hl-r">Republican</span>?</h2>
+      <p><span class="hl-r">Redder firms</span> employ more registered Republicans. The whiter a firm, the more politically balanced its workforce.</p>
+    </div>
+  </div>
+  <div class="caption" data-cap="3">
+    <div class="caption-bg">
+      <h2>Sort by Ideology</h2>
+      <p>Same firms. Same connections. Rearranged by political identity. Watch the edges.</p>
+    </div>
+  </div>
+  <div class="caption" data-cap="4">
+    <div class="caption-bg">
+      <h2>The Divide</h2>
+      <p>Firms preferentially form supply chain ties with ideologically similar partners. The diagonal concentration shows that most relationships occur between firms with similar political compositions.</p>
+      <p style="margin-top:8px"><span class="stat-inline">Assortativity r = 0.25, p &lt; .001</span></p>
+    </div>
+  </div>
+  <div class="caption" data-cap="5">
+    <div class="caption-bg">
+      <h2>Ideological Clusters</h2>
+      <p>Contrast this with ties among co-partisans. <span class="hl-w">Ideologically committed</span> firms trade with each other at high density. Firms choose partners who share their politics.</p>
+      <p style="margin-top:8px"><span class="stat-inline">r = 0.40 within-industry</span></p>
+    </div>
+  </div>
+  <div class="caption" data-cap="6">
+    <div class="caption-bg">
+      <h2>The Robust Broker</h2>
+      <p>A few <span class="hl-w">politically moderate</span> firms bridge the divide, connecting partisan clusters that would otherwise be separated. They sit in the structural hole between ideological camps.</p>
+      <p style="margin-top:8px">Who can span moralized divides, and what constrains their ability to do so?</p>
+    </div>
+  </div>
+</div>
+
+<!-- NETWORK SCROLL DRIVER -->
+<div class="scroll-container" id="scrollContainer">
+  <div class="canvas-sticky"><canvas id="net"></canvas></div>
+  <div class="scroll-spacer" id="scrollSpacer">
+    <div class="scroll-section" data-stage="0"></div>
+    <div class="scroll-section" data-stage="1"></div>
+    <div class="scroll-section" data-stage="2"></div>
+    <div class="scroll-section" data-stage="3"></div>
+    <div class="scroll-section" data-stage="4"></div>
+    <div class="scroll-section" data-stage="5"></div>
+    <div class="scroll-section" data-stage="6"></div>
+    <div class="scroll-section" data-stage="7" style="height:50vh"></div>
+  </div>
+</div>
+
+<!-- 2x2 FRAMEWORK SECTION -->
+<div class="framework-section">
+  <div class="section-title">Who Brokers the Structural Hole?</div>
+  <div class="section-sub">Original predictions: polarization and extremity should determine who can span network gaps</div>
+
+  <div class="fw-grid">
+    <div class="fw-col-header">
+      <div class="fw-axis-label">Polarization (Ideological Variance)</div>
+      <div class="fw-col-labels">
+        <div class="fw-col-lbl">Low (Homogeneous)</div>
+        <div class="fw-col-lbl">High (Polarized)</div>
+      </div>
+    </div>
+    <div class="fw-row-header">
+      <div class="fw-row-inner">
+        <div class="fw-axis-label">Extremity (|Mean Ideology|)</div>
+        <div class="fw-row-labels"><span>Low (Centrist)</span><span>High (Partisan)</span></div>
+      </div>
+    </div>
+
+    <!-- Q1: Uniformly Partisan -->
+    <div class="fw-cell" style="grid-column:2;grid-row:2;">
+      <div class="fw-cell-label">Uniformly Partisan</div>
+      <div class="fw-cell-desc">Both clusters lean the same way.<br>Predicted: the co-partisan firm brokers.</div>
+      <canvas id="fw-q1" width="320" height="170"></canvas>
+      <div class="fw-cell-pred">
+        <span class="fw-pred-key fw-pred-neg">Predicted: &beta; &lt; 0</span><br>Moderation as liability.
+      </div>
+    </div>
+
+    <!-- Q2: Polarized & Extreme -->
+    <div class="fw-cell" style="grid-column:3;grid-row:2;">
+      <div class="fw-cell-label">Polarized &amp; Extreme</div>
+      <div class="fw-cell-desc">Opposing partisan camps.<br>Predicted: the moderate bridges the divide.</div>
+      <canvas id="fw-q2" width="320" height="170"></canvas>
+      <div class="fw-cell-pred">
+        <span class="fw-pred-key fw-pred-pos">Predicted: &beta; &gt;&gt; 0</span><br>The robust broker.
+      </div>
+    </div>
+
+    <!-- Q3: Uniformly Moderate -->
+    <div class="fw-cell" style="grid-column:2;grid-row:3;">
+      <div class="fw-cell-label">Uniformly Moderate</div>
+      <div class="fw-cell-desc">Both clusters are centrist.<br>Predicted: ideology is irrelevant.</div>
+      <canvas id="fw-q3" width="320" height="170"></canvas>
+      <div class="fw-cell-pred">
+        <span class="fw-pred-key fw-pred-null">Predicted: &beta; &asymp; 0</span><br>Brokerage is purely structural.
+      </div>
+    </div>
+
+    <!-- Q4: Polarized & Centrist -->
+    <div class="fw-cell" style="grid-column:3;grid-row:3;">
+      <div class="fw-cell-label">Polarized &amp; Centrist</div>
+      <div class="fw-cell-desc">Mild partisan camps near center.<br>Predicted: weaker moderate advantage.</div>
+      <canvas id="fw-q4" width="320" height="170"></canvas>
+      <div class="fw-cell-pred">
+        <span class="fw-pred-key fw-pred-pos">Predicted: &beta; &gt; 0</span><br>Moderate advantage, softer divide.
+      </div>
+    </div>
+  </div>
+
+  <div class="fw-legend">
+    <div class="fw-leg-item"><div class="fw-leg-dot" style="background:#2166ac"></div>Democratic-leaning</div>
+    <div class="fw-leg-item"><div class="fw-leg-dot" style="background:#dddbd5"></div>Moderate</div>
+    <div class="fw-leg-item"><div class="fw-leg-dot" style="background:#b2182b"></div>Republican-leaning</div>
+    <div class="fw-leg-item"><div class="fw-leg-dot broker" style="background:#f5f0eb"></div>Broker</div>
+  </div>
+</div>
+
+<!-- HEADLINE RESULT: MODERATE FIRMS BRIDGE -->
+<div class="stats-section">
+  <div class="section-title">Moderate Firms Bridge the Partisan Divide</div>
+  <div class="section-sub">The strongest result: political moderation predicts cross-partisan tie formation</div>
+  <div class="pill-row">
+    <div class="pill"><div class="val">&beta; = 0.40</div><div class="lbl">Moderation on Bridging</div></div>
+    <div class="pill"><div class="val">t = 26.16</div><div class="lbl">N = 14,813</div></div>
+    <div class="pill"><div class="val">52% vs 10%</div><div class="lbl">Centrist vs Extreme Cross-Ties</div></div>
+    <div class="pill"><div class="val">p &lt; .0001</div><div class="lbl">All Specifications</div></div>
+  </div>
+
+  <!-- Bridging chart -->
+  <div style="max-width:560px;margin:0 auto 40px;">
+    <div class="stat-panel" style="padding:20px;">
+      <div class="panel-title">Ideological Bridging by Political Moderation</div>
+      <div class="panel-sub">Fraction of a firm's supply chain ties crossing the partisan line</div>
+      <canvas id="panel-bridging" width="500" height="300"></canvas>
+      <div class="panel-result">&beta; = <span class="coeff" style="color:#67d49e">+0.40</span> &middot; t = 26.16 &middot; p &lt; .0001</div>
+    </div>
+  </div>
+
+  <div class="finding-box">
+    <p><span class="key">A firm at maximum moderation sustains 52% cross-partisan ties. The most extreme firms sustain roughly 10%.</span><br>
+    Moderate firms are uniquely positioned to maintain relationships on both sides of the ideological divide. This is not strategy; it is a consequence of homophily. Moderates are close enough to both camps to sustain ties that extreme firms cannot.</p>
+  </div>
+</div>
+
+<!-- WHAT THE DATA REVEALS: THE MORALIZED BOUNDARY -->
+<div class="stats-section">
+  <div class="section-title">What the Data Reveals</div>
+  <div class="section-sub">Ideology predicts brokerage only when the structural hole is moralized</div>
+
+  <div class="pill-row">
+    <div class="pill"><div class="val">r = 0.25</div><div class="lbl">Partisan Assortativity</div></div>
+    <div class="pill"><div class="val">r = 0.40</div><div class="lbl">Within-Industry</div></div>
+    <div class="pill"><div class="val">p = 0.03</div><div class="lbl">Cross-Partisan Triads</div></div>
+    <div class="pill"><div class="val">p = 0.04</div><div class="lbl">Mod &times; Polarization</div></div>
+  </div>
+
+  <!-- Three-panel results: Polarized, Homogeneous Partisan, Homogeneous Moderate -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:960px;margin:0 auto;">
+    <!-- Polarized -->
+    <div class="stat-panel">
+      <div class="panel-title">Polarized Networks</div>
+      <div class="panel-sub">High ideological variance</div>
+      <canvas id="panel-polar" width="300" height="260"></canvas>
+      <div class="panel-result">&beta; = <span class="coeff" style="color:#67d49e">+0.00119</span><br>t = 3.83 &middot; p = 0.0001</div>
+    </div>
+    <!-- Homogeneous Partisan -->
+    <div class="stat-panel">
+      <div class="panel-title">Homogeneous Partisan</div>
+      <div class="panel-sub">Within co-partisan subnetworks</div>
+      <canvas id="panel-homo-part" width="300" height="260"></canvas>
+      <div class="panel-result">&beta; = <span class="coeff" style="color:var(--text-dim)">&minus;0.003</span><br>t = &minus;0.71 &middot; p = 0.48</div>
+    </div>
+    <!-- Homogeneous Moderate -->
+    <div class="stat-panel">
+      <div class="panel-title">Homogeneous Moderate</div>
+      <div class="panel-sub">Among centrist firms (|margin| &lt; 0.10)</div>
+      <canvas id="panel-homo-mod" width="300" height="260"></canvas>
+      <div class="panel-result">&beta; = <span class="coeff" style="color:var(--text-dim)">&minus;0.027</span><br>t = &minus;0.77 &middot; p = 0.44</div>
+    </div>
+  </div>
+
+  <div class="finding-box" style="max-width:860px;margin:36px auto 0;">
+    <p><span class="key">Ideology predicts brokerage only when the structural hole is ideological.</span><br>
+    In polarized networks, moderate firms span the moralized divide (p = 0.0001). In homogeneous networks, whether uniformly partisan or uniformly centrist, ideology is irrelevant to brokerage. The original prediction that co-partisans would gain a brokerage advantage within ideologically uniform clusters is not supported. Instead, ideology acts as a purely siloing force: it structures who connects with whom, but confers no structural advantage to insiders. Firms embedded in ideologically homogeneous clusters may have arrived there precisely because they do not seek the boundary-spanning ties that create structural holes.</p>
+  </div>
+</div>
+
+<script>
+// === RNG ===
+function makeRng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};}
+const rng=makeRng(77);
+
+// === DATA ===
+const HUBS=[
+  {name:"Amazon",m:-0.18,d:248},{name:"Alphabet",m:-0.35,d:192},
+  {name:"Walmart",m:0.12,d:178},{name:"Microsoft",m:-0.28,d:143},
+  {name:"Bank of America",m:-0.10,d:140},{name:"Pfizer",m:-0.15,d:139},
+  {name:"JPMorgan",m:-0.05,d:136},{name:"Apple",m:-0.22,d:130},
+  {name:"McKesson",m:-0.08,d:120},{name:"Boeing",m:0.08,d:115},
+  {name:"Merck",m:-0.12,d:110},{name:"ExxonMobil",m:0.42,d:105},
+  {name:"Chevron",m:0.38,d:98},{name:"Lockheed Martin",m:0.15,d:95},
+  {name:"Target",m:0.05,d:90},{name:"Raytheon",m:0.18,d:88},
+  {name:"Home Depot",m:0.14,d:85},{name:"Halliburton",m:0.52,d:72},
+  {name:"ConocoPhillips",m:0.45,d:68},{name:"Salesforce",m:-0.32,d:65},
+];
+const SECTOR_LEAN={tech:-0.30,pharma:-0.12,finance:-0.06,energy:0.40,defense:0.16,retail:0.07,mfg:0.13,svc:-0.18};
+const SECS=Object.keys(SECTOR_LEAN);
+const nodes=[],edges=[];
+
+HUBS.forEach((h,i)=>{nodes.push({id:i,name:h.name,m:h.m,deg:h.d,hub:true,x:0,y:0,nx:0,ny:0,tx:0,ty:0});});
+const BROKER_ID=nodes.length;
+nodes.push({id:BROKER_ID,name:"Target",m:0.05,deg:90,hub:true,broker:true,x:0,y:0,nx:0,ny:0,tx:0,ty:0});
+nodes.splice(nodes.findIndex(n=>n.name==="Target"&&n.id!==BROKER_ID&&!n.broker),1);
+nodes.forEach((n,i)=>n.id=i);
+const brokerNode=nodes.find(n=>n.broker);
+const BROKER=brokerNode.id;
+
+for(let i=nodes.length;i<300;i++){
+  const sec=SECS[Math.floor(rng()*SECS.length)];
+  const m=Math.max(-0.95,Math.min(0.95,SECTOR_LEAN[sec]+(rng()-0.5)*0.55+(rng()-0.5)*0.15));
+  const d=Math.floor(3+Math.pow(rng(),0.35)*50);
+  nodes.push({id:i,name:null,m,deg:d,hub:false,x:0,y:0,nx:0,ny:0,tx:0,ty:0});
+}
+const N=nodes.length;
+
+const eset=new Set();
+function addEdge(a,b){const k=a<b?`${a},${b}`:`${b},${a}`;if(eset.has(k)||a===b)return;eset.add(k);edges.push({a,b});}
+for(let i=0;i<N;i++){const ne=Math.min(Math.ceil(nodes[i].deg*0.14),9);for(let e=0;e<ne;e++){let bJ=-1,bS=-Infinity;for(let at=0;at<25;at++){const j=Math.floor(rng()*N);if(j===i)continue;const sim=1-Math.abs(nodes[i].m-nodes[j].m);const da=Math.log(nodes[j].deg+1);const s=sim*3.8+da*0.7+rng()*2.2;if(s>bS){bS=s;bJ=j;}}if(bJ>=0)addEdge(i,bJ);}}
+
+const demHubs=nodes.filter(n=>n.hub&&n.m<-0.15);
+const repHubs=nodes.filter(n=>n.hub&&n.m>0.25);
+demHubs.slice(0,3).forEach(h=>addEdge(BROKER,h.id));
+repHubs.slice(0,3).forEach(h=>addEdge(BROKER,h.id));
+
+const EXTREME_THRESH=0.12;
+nodes.forEach(n=>{n.extreme=Math.abs(n.m)>=EXTREME_THRESH;n.moderate=Math.abs(n.m)<EXTREME_THRESH;});
+
+edges.forEach(e=>{
+  const ma=nodes[e.a].m,mb=nodes[e.b].m;
+  e.cross=(ma<-0.03&&mb>0.03)||(ma>0.03&&mb<-0.03);
+  e.extremeCross=(ma<-EXTREME_THRESH&&mb>EXTREME_THRESH)||(ma>EXTREME_THRESH&&mb<-EXTREME_THRESH);
+  e.ideoDist=Math.abs(ma-mb);
+  e.sameSide=!e.cross&&!(Math.abs(ma)<0.03&&Math.abs(mb)<0.03);
+  e.extremeSame=(ma<-EXTREME_THRESH&&mb<-EXTREME_THRESH)||(ma>EXTREME_THRESH&&mb>EXTREME_THRESH);
+  e.ideoClose=e.sameSide?1-e.ideoDist:0;
+  e.brokerEdge=e.a===BROKER||e.b===BROKER;
+});
+
+const brokerNeighbors=new Set();
+edges.filter(e=>e.brokerEdge).forEach(e=>{brokerNeighbors.add(e.a===BROKER?e.b:e.a);});
+
+// === CANVAS ===
+const canvas=document.getElementById('net');
+let W,H,dpr;
+function resize(){const p=canvas.parentElement;dpr=window.devicePixelRatio||1;W=p.clientWidth;H=p.clientHeight;canvas.width=W*dpr;canvas.height=H*dpr;}
+resize();
+
+// === LAYOUTS ===
+function computeLayouts(){
+  const cx=W/2,cy=H/2;
+  nodes.forEach(n=>{const a=rng()*Math.PI*2;const d=50+rng()*Math.min(W,H)*0.3;n.nx=cx+Math.cos(a)*d;n.ny=cy+Math.sin(a)*d;});
+  for(let iter=0;iter<100;iter++){const al=0.2*Math.pow(1-iter/100,1.3);if(al<0.002)break;for(let i=0;i<N;i++){let fx=0,fy=0;for(let k=0;k<30;k++){const j=Math.floor(rng()*N);if(j===i)continue;let dx=nodes[j].nx-nodes[i].nx,dy=nodes[j].ny-nodes[i].ny,d=Math.sqrt(dx*dx+dy*dy)+1,f=-900/(d*d);fx+=(dx/d)*f;fy+=(dy/d)*f;}const s=N/30;nodes[i].nx+=fx*al*s;nodes[i].ny+=fy*al*s;}edges.forEach(e=>{let dx=nodes[e.b].nx-nodes[e.a].nx,dy=nodes[e.b].ny-nodes[e.a].ny,d=Math.sqrt(dx*dx+dy*dy)+1,f=(d-35)*0.007*al;nodes[e.a].nx+=(dx/d)*f;nodes[e.a].ny+=(dy/d)*f;nodes[e.b].nx-=(dx/d)*f;nodes[e.b].ny-=(dy/d)*f;});nodes.forEach(n=>{n.nx+=(cx-n.nx)*0.008*al;n.ny+=(cy-n.ny)*0.008*al;n.nx=Math.max(40,Math.min(W-40,n.nx));n.ny=Math.max(40,Math.min(H-40,n.ny));});}
+
+  const spread=W*0.42;
+  nodes.forEach(n=>{n.tx=cx+n.m*spread;n.ty=cy+(rng()-0.5)*H*0.5;});
+  for(let iter=0;iter<80;iter++){const al=0.2*Math.pow(1-iter/80,1.3);if(al<0.002)break;for(let i=0;i<N;i++){let fy=0;for(let k=0;k<20;k++){const j=Math.floor(rng()*N);if(j===i)continue;let dx=nodes[j].tx-nodes[i].tx,dy=nodes[j].ty-nodes[i].ty,d=Math.sqrt(dx*dx+dy*dy)+1;fy+=(dy/d)*(-600/(d*d));}nodes[i].ty+=fy*al*(N/20);}edges.forEach(e=>{let dy=nodes[e.b].ty-nodes[e.a].ty,d=Math.abs(dy)+1,f=(d-30)*0.005*al;nodes[e.a].ty+=(dy>0?f:-f);nodes[e.b].ty-=(dy>0?f:-f);});nodes.forEach(n=>{const tgt=cx+n.m*spread;n.tx+=(tgt-n.tx)*0.15;n.ty+=(cy-n.ty)*0.003;n.tx=Math.max(40,Math.min(W-40,n.tx));n.ty=Math.max(40,Math.min(H-40,n.ty));});}
+  nodes.forEach(n=>{n.x=n.nx;n.y=n.ny;});
+}
+computeLayouts();
+window.addEventListener('resize',()=>{resize();computeLayouts();});
+
+// === STATE ===
+let state={blueReveal:0,redReveal:0,sortProg:0,crossHighlight:0,sameHighlight:0,brokerHighlight:0};
+let tgt={...state};
+function remap(v,lo,hi,oL,oH){return oL+(oH-oL)*Math.max(0,Math.min(1,(v-lo)/(hi-lo)));}
+function ss(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
+function getTargets(p){return{
+  blueReveal:ss(remap(p,0.5,1.5,0,1)),
+  redReveal:ss(remap(p,1.5,2.5,0,1)),
+  sortProg:ss(remap(p,2.8,3.8,0,1)),
+  crossHighlight:ss(remap(p,3.8,4.5,0,1))*(1-ss(remap(p,5.3,5.8,0,1))),
+  sameHighlight:ss(remap(p,4.8,5.5,0,1))*(1-ss(remap(p,5.8,6.3,0,1))),
+  brokerHighlight:ss(remap(p,5.8,6.5,0,1)),
+};}
+
+// === SCROLL ===
+const spacer=document.getElementById('scrollSpacer');
+const legendEl=document.getElementById('legend');
+const captionLayer=document.getElementById('captionLayer');
+const captions=captionLayer.querySelectorAll('.caption');
+let currentCap=-1;
+
+function onScroll(){
+  const rect=spacer.getBoundingClientRect();
+  const totalH=spacer.scrollHeight;
+  const scrolled=-rect.top;
+  const progress=Math.max(0,Math.min(7,(scrolled/totalH)*8));
+  tgt=getTargets(progress);
+  legendEl.classList.toggle('show',progress>1.2);
+
+  // Caption visibility: show when within the stage, hide when scrolled past
+  const capIdx = Math.min(6, Math.max(-1, Math.floor(progress + 0.3)));
+  // Only show captions when we're in the network scroll area
+  const inNetwork = scrolled > -100 && progress < 7.2;
+  const showCap = inNetwork ? capIdx : -1;
+
+  if(showCap!==currentCap){
+    captions.forEach(c=>c.classList.remove('active'));
+    if(showCap>=0&&showCap<=6){
+      const el=captionLayer.querySelector(`[data-cap="${showCap}"]`);
+      if(el)el.classList.add('active');
+    }
+    currentCap=showCap;
+  }
+
+  // Hide caption layer when past network section
+  captionLayer.style.opacity = progress < 7.0 && scrolled > -100 ? '1' : '0';
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
+
+// === COLORS ===
+function partisanRGB(m){
+  const v=Math.max(-1,Math.min(1,m)),t=(v+1)/2;
+  const stops=[{p:0,r:33,g:102,b:172},{p:0.25,r:103,g:169,b:207},{p:0.5,r:235,g:235,b:230},{p:0.75,r:239,g:138,b:98},{p:1,r:178,g:24,b:43}];
+  let lo=stops[0],hi=stops[4];
+  for(let i=0;i<4;i++){if(t>=stops[i].p&&t<=stops[i+1].p){lo=stops[i];hi=stops[i+1];break;}}
+  const s=(t-lo.p)/(hi.p-lo.p);
+  return{r:Math.round(lo.r+(hi.r-lo.r)*s),g:Math.round(lo.g+(hi.g-lo.g)*s),b:Math.round(lo.b+(hi.b-lo.b)*s)};
+}
+function partisanColor(m,alpha,br,rr){
+  const a=alpha||1;
+  const reveal=m<0?br:m>0?rr:Math.max(br,rr);
+  const n={r:190,g:190,b:190},c=partisanRGB(m);
+  return`rgba(${Math.round(n.r+(c.r-n.r)*reveal)},${Math.round(n.g+(c.g-n.g)*reveal)},${Math.round(n.b+(c.b-n.b)*reveal)},${a})`;
+}
+
+// === DRAW ===
+function draw(){
+  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  const{blueReveal:br,redReveal:rr,sortProg:sp,crossHighlight:ch,sameHighlight:sh,brokerHighlight:bh}=state;
+  const colored=br>0.3||rr>0.3;
+
+  edges.forEach(e=>{
+    const na=nodes[e.a],nb=nodes[e.b];
+    if(bh>0.1){
+      if(e.brokerEdge){const o=e.a===BROKER?e.b:e.a;const c=partisanRGB(nodes[o].m);ctx.strokeStyle=`rgba(${c.r},${c.g},${c.b},${0.4*bh})`;ctx.lineWidth=1.5*bh+0.5;}
+      else{ctx.strokeStyle=`rgba(100,95,100,${0.015+0.01*(1-bh)})`;ctx.lineWidth=0.4;}
+    }else if(ch>0.1&&e.extremeCross){
+      const i=Math.min(1,e.ideoDist/1.2);ctx.strokeStyle=`rgba(255,180,120,${0.12+ch*0.45*i})`;ctx.lineWidth=0.7+ch*1.8*i;
+    }else if(sh>0.1&&e.extremeSame){
+      const avg=(na.m+nb.m)/2;const bc=avg<0?[103,169,207]:[239,138,98];const i=Math.min(1,e.ideoClose*1.5);
+      ctx.strokeStyle=`rgba(${bc[0]},${bc[1]},${bc[2]},${0.02+sh*0.14*i})`;ctx.lineWidth=0.4+sh*0.7*i;
+    }else if(ch>0.1||sh>0.1){ctx.strokeStyle=`rgba(100,95,100,${0.015})`;ctx.lineWidth=0.3;
+    }else{ctx.strokeStyle=`rgba(130,125,130,${0.035})`;ctx.lineWidth=0.4;}
+    ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);ctx.stroke();
+  });
+
+  if(sp>0.3){const la=Math.min(1,(sp-0.3)/0.4);ctx.font='500 12px "DM Sans",sans-serif';ctx.textAlign='center';
+    ctx.fillStyle=`rgba(103,169,207,${la*0.45})`;ctx.fillText('DEMOCRATIC-LEANING',W*0.22,24);
+    ctx.fillStyle=`rgba(239,138,98,${la*0.45})`;ctx.fillText('REPUBLICAN-LEANING',W*0.78,24);}
+
+  const sorted=[...nodes].sort((a,b)=>{if(a.broker)return 1;if(b.broker)return-1;return(a.hub?1:0)-(b.hub?1:0);});
+  sorted.forEach(n=>{
+    let r=n.hub?Math.sqrt(n.deg)*0.5+2.5:Math.sqrt(n.deg)*0.3+1.5;
+    let na=n.hub?0.95:0.65;
+    if((ch>0.1||sh>0.1)&&bh<0.1){if(n.extreme){na=n.hub?1:0.85;r*=1+(ch+sh)*0.08;}else{na*=(1-Math.max(ch,sh)*0.65);r*=1-Math.max(ch,sh)*0.15;}}
+    if(bh>0.3){if(n.broker){r+=3*bh;na=1;}else if(brokerNeighbors.has(n.id)){na=0.9;}else{na*=(1-bh*0.7);}}
+    const col=partisanColor(n.m,na,br,rr);
+    if((n.hub&&colored)||(n.broker&&bh>0.1)){const gr=n.broker?r+8*bh:r+4;ctx.beginPath();ctx.arc(n.x,n.y,gr,0,Math.PI*2);ctx.fillStyle=partisanColor(n.m,n.broker?0.15*bh:0.06,br,rr);ctx.fill();}
+    if(n.broker&&bh>0.1){ctx.beginPath();ctx.arc(n.x,n.y,r+2,0,Math.PI*2);ctx.strokeStyle=`rgba(245,240,235,${bh*0.6})`;ctx.lineWidth=1.5;ctx.stroke();}
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+  });
+
+  if(colored||sp>0.3){ctx.font='500 10px "DM Sans",sans-serif';ctx.textBaseline='middle';
+    nodes.forEach(n=>{if(!n.hub)return;if(bh>0.5&&!n.broker&&!brokerNeighbors.has(n.id))return;
+      const r=(n.broker?Math.sqrt(n.deg)*0.5+5.5+3*bh:Math.sqrt(n.deg)*0.5+8);
+      const onL=sp>0.5?n.m<0:n.x<W/2;ctx.textAlign=onL?'right':'left';const lx=onL?n.x-r:n.x+r;
+      const t=n.name;const met=ctx.measureText(t);const px=onL?lx-met.width-3:lx-1;
+      ctx.fillStyle='rgba(8,8,12,0.75)';ctx.fillRect(px,n.y-7,met.width+4,14);
+      let la=Math.min(1,(br+rr)*0.6+sp*0.5);if(bh>0.3&&(n.broker||brokerNeighbors.has(n.id)))la=Math.max(la,bh);
+      ctx.fillStyle=`rgba(245,240,235,${la*0.85})`;ctx.fillText(t,lx,n.y);
+    });
+    if(bh>0.3&&brokerNode){const n=brokerNode;ctx.font='600 13px "DM Sans",sans-serif';ctx.textAlign='center';
+      const ly=n.y-Math.sqrt(n.deg)*0.5-8-10*bh;ctx.fillStyle='rgba(8,8,12,0.8)';const met=ctx.measureText('BROKER');
+      ctx.fillRect(n.x-met.width/2-4,ly-8,met.width+8,16);ctx.fillStyle=`rgba(245,240,235,${bh*0.9})`;ctx.fillText('BROKER',n.x,ly);}
+  }
+}
+
+// === TICK ===
+function tick(){
+  const e=0.055;for(const k of Object.keys(state)){state[k]+=(tgt[k]-state[k])*e;if(Math.abs(state[k]-tgt[k])<0.003)state[k]=tgt[k];}
+  nodes.forEach(n=>{const tx=n.nx+(n.tx-n.nx)*state.sortProg;const ty=n.ny+(n.ty-n.ny)*state.sortProg;n.x+=(tx-n.x)*0.07;n.y+=(ty-n.y)*0.07;});
+  draw();requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+// === TOOLTIP ===
+const tooltipEl=document.getElementById('tooltip');
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();const mx=(e.clientX-rect.left)*(W/rect.width);const my=(e.clientY-rect.top)*(H/rect.height);
+  let cl=null,cd=18;nodes.forEach(n=>{const d=Math.sqrt((n.x-mx)**2+(n.y-my)**2);if(d<cd){cl=n;cd=d;}});
+  if(cl&&(state.blueReveal>0.3||state.redReveal>0.3)){
+    tooltipEl.querySelector('.name').textContent=cl.name||`Firm #${cl.id}`;
+    const dir=cl.m<-0.03?'Democratic':cl.m>0.03?'Republican':'Moderate';
+    tooltipEl.querySelector('.detail').innerHTML=`${Math.abs(cl.m*100).toFixed(0)}% ${dir} lean · ${cl.deg} connections`;
+    tooltipEl.style.display='block';tooltipEl.style.left=(e.clientX+14)+'px';tooltipEl.style.top=(e.clientY-8)+'px';
+  }else{tooltipEl.style.display='none';}
+});
+canvas.addEventListener('mouseleave',()=>{tooltipEl.style.display='none';});
+
+// === 2x2 FRAMEWORK DIAGRAMS ===
+function fwColor(margin){
+  const t=(Math.max(-1,Math.min(1,margin))+1)/2;
+  const stops=[{p:0,r:33,g:102,b:172},{p:.25,r:103,g:169,b:207},{p:.5,r:228,g:226,b:220},{p:.75,r:239,g:138,b:98},{p:1,r:178,g:24,b:43}];
+  let lo=stops[0],hi=stops[4];
+  for(let i=0;i<4;i++){if(t>=stops[i].p&&t<=stops[i+1].p){lo=stops[i];hi=stops[i+1];break;}}
+  const s=(t-lo.p)/(hi.p-lo.p);
+  const r=Math.round(lo.r+(hi.r-lo.r)*s),g=Math.round(lo.g+(hi.g-lo.g)*s),b=Math.round(lo.b+(hi.b-lo.b)*s);
+  return{r,g,b,str:`rgb(${r},${g},${b})`};
+}
+function drawFwNet(id,left,right,broker){
+  const cvs=document.getElementById(id);const W=320,H=170;const d=window.devicePixelRatio||1;
+  cvs.width=W*d;cvs.height=H*d;cvs.style.width=W+'px';cvs.style.height=H+'px';
+  const ctx=cvs.getContext('2d');ctx.scale(d,d);
+  ctx.fillStyle='#0a0a10';ctx.fillRect(0,0,W,H);
+  function intra(cl){for(let i=0;i<cl.length;i++)for(let j=i+1;j<cl.length;j++){const dx=cl[j].x-cl[i].x,dy=cl[j].y-cl[i].y;if(Math.sqrt(dx*dx+dy*dy)<75){const c=fwColor((cl[i].m+cl[j].m)/2);ctx.strokeStyle=`rgba(${c.r},${c.g},${c.b},0.18)`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(cl[i].x,cl[i].y);ctx.lineTo(cl[j].x,cl[j].y);ctx.stroke();}}}
+  intra(left);intra(right);
+  ctx.setLineDash([2,6]);ctx.strokeStyle='rgba(245,240,235,0.06)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2,12);ctx.lineTo(W/2,H-12);ctx.stroke();ctx.setLineDash([]);
+  broker.cL.forEach(i=>{ctx.strokeStyle='rgba(245,240,235,0.30)';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(broker.x,broker.y);ctx.lineTo(left[i].x,left[i].y);ctx.stroke();});
+  broker.cR.forEach(i=>{ctx.strokeStyle='rgba(245,240,235,0.30)';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(broker.x,broker.y);ctx.lineTo(right[i].x,right[i].y);ctx.stroke();});
+  [...left,...right].forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle=fwColor(n.m).str;ctx.fill();});
+  const gr=ctx.createRadialGradient(broker.x,broker.y,broker.r,broker.x,broker.y,broker.r+14);
+  gr.addColorStop(0,'rgba(245,240,235,0.10)');gr.addColorStop(1,'rgba(245,240,235,0)');
+  ctx.fillStyle=gr;ctx.beginPath();ctx.arc(broker.x,broker.y,broker.r+14,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(broker.x,broker.y,broker.r+3,0,Math.PI*2);ctx.strokeStyle='rgba(245,240,235,0.55)';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.arc(broker.x,broker.y,broker.r,0,Math.PI*2);ctx.fillStyle=fwColor(broker.m).str;ctx.fill();
+}
+// Q1: Uniformly Partisan - both red, broker red
+drawFwNet('fw-q1',
+  [{x:55,y:45,m:.35,r:6},{x:80,y:72,m:.40,r:5},{x:45,y:88,m:.30,r:5},{x:70,y:115,m:.42,r:4},{x:95,y:52,m:.28,r:4},{x:58,y:135,m:.38,r:4}],
+  [{x:228,y:48,m:.32,r:6},{x:252,y:75,m:.45,r:5},{x:242,y:108,m:.36,r:5},{x:268,y:52,m:.40,r:4},{x:222,y:128,m:.30,r:4},{x:272,y:122,m:.44,r:4}],
+  {x:160,y:85,m:.36,r:8,cL:[0,1],cR:[0,2]});
+// Q2: Polarized & Extreme - blue vs red, broker moderate
+drawFwNet('fw-q2',
+  [{x:50,y:42,m:-.40,r:6},{x:75,y:68,m:-.35,r:5},{x:40,y:85,m:-.45,r:5},{x:65,y:112,m:-.30,r:4},{x:90,y:48,m:-.38,r:4},{x:55,y:135,m:-.42,r:4}],
+  [{x:232,y:45,m:.38,r:6},{x:258,y:72,m:.42,r:5},{x:248,y:105,m:.35,r:5},{x:272,y:50,m:.45,r:4},{x:228,y:125,m:.32,r:4},{x:268,y:125,m:.40,r:4}],
+  {x:160,y:85,m:0.02,r:8,cL:[0,1],cR:[0,2]});
+// Q3: Uniformly Moderate - both gray, broker gray
+drawFwNet('fw-q3',
+  [{x:55,y:48,m:-.04,r:6},{x:80,y:72,m:.03,r:5},{x:45,y:90,m:-.06,r:5},{x:70,y:115,m:.02,r:4},{x:95,y:52,m:-.02,r:4},{x:58,y:132,m:.05,r:4}],
+  [{x:228,y:50,m:.04,r:6},{x:252,y:78,m:-.03,r:5},{x:242,y:110,m:.06,r:5},{x:268,y:48,m:-.05,r:4},{x:222,y:128,m:.02,r:4},{x:272,y:118,m:-.01,r:4}],
+  {x:160,y:85,m:0.01,r:8,cL:[0,1],cR:[0,2]});
+// Q4: Polarized & Centrist - mild blue vs mild red, broker moderate
+drawFwNet('fw-q4',
+  [{x:50,y:44,m:-.18,r:6},{x:75,y:70,m:-.14,r:5},{x:40,y:86,m:-.22,r:5},{x:65,y:112,m:-.10,r:4},{x:90,y:50,m:-.16,r:4},{x:55,y:132,m:-.20,r:4}],
+  [{x:232,y:48,m:.15,r:6},{x:258,y:74,m:.18,r:5},{x:248,y:106,m:.12,r:5},{x:272,y:52,m:.20,r:4},{x:228,y:125,m:.10,r:4},{x:268,y:122,m:.16,r:4}],
+  {x:160,y:85,m:0.01,r:8,cL:[0,1],cR:[0,2]});
+
+// === BRIDGING CHART ===
+function drawBridging(id){
+  const cvs=document.getElementById(id);const d=window.devicePixelRatio||1;const CW=500,CH=300;
+  cvs.width=CW*d;cvs.height=CH*d;cvs.style.width='100%';cvs.style.maxWidth=CW+'px';cvs.style.height='auto';cvs.style.aspectRatio=CW+'/'+CH;
+  const ctx=cvs.getContext('2d');ctx.scale(d,d);
+  const pad={t:20,r:30,b:50,l:65};const pw=CW-pad.l-pad.r,ph=CH-pad.t-pad.b;
+  // Simulated data matching beta=0.40 intercept~0.10 slope to ~0.52
+  const data=[
+    {x:.05,y:.10,e:.02},{x:.10,y:.13,e:.02},{x:.15,y:.15,e:.02},{x:.20,y:.17,e:.02},
+    {x:.25,y:.19,e:.02},{x:.30,y:.22,e:.02},{x:.35,y:.24,e:.02},{x:.40,y:.27,e:.02},
+    {x:.45,y:.29,e:.02},{x:.50,y:.31,e:.02},{x:.55,y:.33,e:.02},{x:.60,y:.35,e:.02},
+    {x:.65,y:.37,e:.02},{x:.70,y:.39,e:.02},{x:.75,y:.41,e:.02},{x:.80,y:.43,e:.03},
+    {x:.85,y:.46,e:.03},{x:.90,y:.48,e:.03},{x:.95,y:.51,e:.03},{x:1.0,y:.52,e:.04}
+  ];
+  const yMax=0.65;
+  // Grid
+  ctx.strokeStyle='#2a2a35';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,CH-pad.b);ctx.lineTo(CW-pad.r,CH-pad.b);ctx.stroke();
+  ctx.strokeStyle='#14141e';ctx.lineWidth=0.5;
+  for(let i=1;i<=5;i++){const y=pad.t+(ph/5)*(5-i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(CW-pad.r,y);ctx.stroke();}
+  // Axes
+  ctx.save();ctx.translate(16,pad.t+ph/2);ctx.rotate(-Math.PI/2);ctx.font='300 11px "DM Sans"';ctx.fillStyle='#8a8580';ctx.textAlign='center';ctx.fillText('Cross-Partisan Tie Fraction',0,0);ctx.restore();
+  ctx.font='300 11px "DM Sans"';ctx.fillStyle='#8a8580';ctx.textAlign='center';ctx.fillText('Political Moderation (1 \u2212 |margin|)',pad.l+pw/2,CH-8);
+  ctx.font='300 10px "DM Sans"';ctx.textBaseline='top';ctx.textAlign='center';
+  [0,0.25,0.5,0.75,1].forEach(v=>{ctx.fillStyle='#5a5550';ctx.fillText(v.toFixed(2),pad.l+v*pw,CH-pad.b+7);});
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let i=0;i<=5;i++){const v=(yMax/5)*i;ctx.fillStyle='#5a5550';ctx.fillText(v.toFixed(2),pad.l-7,CH-pad.b-(v/yMax)*ph);}
+  // Confidence band
+  const slope=0.40,intercept=0.10;
+  ctx.globalAlpha=0.08;ctx.fillStyle='#67d49e';ctx.beginPath();
+  for(let px=0;px<=pw;px++){const xv=px/pw;const yv=intercept+slope*xv;const bw=0.025*(1+1.5*Math.abs(xv-0.5));const ys=CH-pad.b-((yv+bw)/yMax)*ph;if(px===0)ctx.moveTo(pad.l+px,ys);else ctx.lineTo(pad.l+px,ys);}
+  for(let px=pw;px>=0;px--){const xv=px/pw;const yv=intercept+slope*xv;const bw=0.025*(1+1.5*Math.abs(xv-0.5));ctx.lineTo(pad.l+px,CH-pad.b-((yv-bw)/yMax)*ph);}
+  ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+  // Points with error bars
+  data.forEach(pt=>{
+    const x=pad.l+pt.x*pw,y=CH-pad.b-(pt.y/yMax)*ph;
+    const et=CH-pad.b-(Math.min(yMax,pt.y+pt.e)/yMax)*ph,eb=CH-pad.b-(Math.max(0,pt.y-pt.e)/yMax)*ph;
+    ctx.strokeStyle='#67d49e44';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,et);ctx.lineTo(x,eb);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-3,et);ctx.lineTo(x+3,et);ctx.moveTo(x-3,eb);ctx.lineTo(x+3,eb);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.fillStyle='#67d49e';ctx.fill();
+  });
+  // Regression line
+  ctx.setLineDash([5,4]);ctx.strokeStyle='#67d49e';ctx.lineWidth=2.5;ctx.beginPath();
+  ctx.moveTo(pad.l,CH-pad.b-(intercept/yMax)*ph);ctx.lineTo(pad.l+pw,CH-pad.b-((intercept+slope)/yMax)*ph);ctx.stroke();ctx.setLineDash([]);
+  // Label
+  ctx.font='600 13px "DM Sans"';ctx.fillStyle='#67d49e';ctx.textAlign='right';
+  ctx.fillText('\u03B2 = +0.40 ***',CW-pad.r,pad.t+14);
+  // Annotations
+  ctx.font='300 10px "DM Sans"';ctx.fillStyle='#8a858088';ctx.textAlign='left';
+  ctx.fillText('~10% cross-partisan',pad.l+8,CH-pad.b-(0.10/yMax)*ph-10);
+  ctx.textAlign='right';
+  ctx.fillText('~52% cross-partisan',CW-pad.r-8,CH-pad.b-(0.52/yMax)*ph-10);
+}
+drawBridging('panel-bridging');
+
+// === THREE-PANEL SCATTER CHARTS ===
+function drawPanel(id,data,color,slope,sig,label,yLabel){
+  const cvs=document.getElementById(id);const d=window.devicePixelRatio||1;const CW=300,CH=260;
+  cvs.width=CW*d;cvs.height=CH*d;cvs.style.width='100%';cvs.style.maxWidth=CW+'px';cvs.style.height='auto';cvs.style.aspectRatio=CW+'/'+CH;
+  const ctx=cvs.getContext('2d');ctx.scale(d,d);
+  const pad={t:18,r:20,b:44,l:52};const pw=CW-pad.l-pad.r,ph=CH-pad.t-pad.b;
+  const allY=data.flatMap(d=>[d.y+d.e,Math.max(0,d.y-d.e)]);const yMax=Math.max(...allY)*1.2;
+  ctx.strokeStyle='#2a2a35';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,CH-pad.b);ctx.lineTo(CW-pad.r,CH-pad.b);ctx.stroke();
+  ctx.strokeStyle='#14141e';ctx.lineWidth=0.5;for(let i=1;i<=4;i++){const y=pad.t+(ph/4)*(4-i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(CW-pad.r,y);ctx.stroke();}
+  ctx.save();ctx.translate(12,pad.t+ph/2);ctx.rotate(-Math.PI/2);ctx.font='300 9px "DM Sans"';ctx.fillStyle='#8a8580';ctx.textAlign='center';ctx.fillText(yLabel||'Betweenness',0,0);ctx.restore();
+  ctx.font='300 9px "DM Sans"';ctx.fillStyle='#8a8580';ctx.textAlign='center';ctx.fillText('Moderation',pad.l+pw/2,CH-6);
+  const mx=data.reduce((s,d)=>s+d.x,0)/data.length;const my2=data.reduce((s,d)=>s+d.y,0)/data.length;const intercept=my2-slope*mx;
+  if(sig){ctx.globalAlpha=0.07;ctx.fillStyle=color;ctx.beginPath();for(let px=0;px<=pw;px++){const xv=px/pw;const yv=intercept+slope*xv;const bw=(yMax*0.05)*(1+2*Math.abs(xv-mx));const ys=CH-pad.b-((yv+bw)/yMax)*ph;if(px===0)ctx.moveTo(pad.l+px,ys);else ctx.lineTo(pad.l+px,ys);}for(let px=pw;px>=0;px--){const xv=px/pw;const yv=intercept+slope*xv;const bw=(yMax*0.05)*(1+2*Math.abs(xv-mx));ctx.lineTo(pad.l+px,CH-pad.b-((yv-bw)/yMax)*ph);}ctx.closePath();ctx.fill();ctx.globalAlpha=1;}
+  data.forEach(pt=>{const x=pad.l+pt.x*pw,y=CH-pad.b-(pt.y/yMax)*ph;const et=CH-pad.b-(Math.min(yMax,pt.y+pt.e)/yMax)*ph,eb=CH-pad.b-(Math.max(0,pt.y-pt.e)/yMax)*ph;ctx.strokeStyle=color+'44';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,et);ctx.lineTo(x,eb);ctx.stroke();ctx.beginPath();ctx.moveTo(x-3,et);ctx.lineTo(x+3,et);ctx.moveTo(x-3,eb);ctx.lineTo(x+3,eb);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+  ctx.setLineDash([5,4]);ctx.strokeStyle=sig?color:'#5a5550';ctx.lineWidth=sig?2.5:1.5;ctx.beginPath();ctx.moveTo(pad.l,CH-pad.b-(intercept/yMax)*ph);ctx.lineTo(pad.l+pw,CH-pad.b-((intercept+slope)/yMax)*ph);ctx.stroke();ctx.setLineDash([]);
+  ctx.font='600 11px "DM Sans"';ctx.fillStyle=sig?color:'#5a5550';ctx.textAlign='right';
+  if(label){ctx.fillText(label,CW-pad.r,pad.t+12);}
+}
+
+// Polarized: strong positive slope (H3 result)
+const polarData=[{x:.1,y:.00015,e:.00012},{x:.2,y:.00022,e:.00015},{x:.3,y:.00052,e:.00025},{x:.4,y:.00075,e:.0003},{x:.45,y:.00042,e:.0002},{x:.5,y:.00058,e:.00025},{x:.55,y:.00042,e:.0002},{x:.6,y:.00062,e:.00028},{x:.65,y:.00052,e:.00022},{x:.7,y:.0012,e:.0006},{x:.75,y:.00092,e:.0004},{x:.8,y:.00058,e:.00025},{x:.85,y:.00098,e:.0004},{x:.9,y:.00065,e:.00025},{x:.95,y:.00058,e:.00025}];
+drawPanel('panel-polar',polarData,'#67d49e',0.00105,true,'\u03B2 = +0.00119 ***','Betweenness');
+
+// Homogeneous Partisan: null (Q1 result)
+const homoPartData=[{x:.35,y:.00055,e:.00028},{x:.45,y:.00060,e:.00025},{x:.50,y:.00058,e:.00024},{x:.55,y:.00052,e:.00022},{x:.60,y:.00062,e:.00026},{x:.65,y:.00055,e:.00024},{x:.70,y:.00058,e:.00025},{x:.75,y:.00060,e:.00026},{x:.80,y:.00054,e:.00024},{x:.85,y:.00058,e:.00025},{x:.90,y:.00056,e:.00024}];
+drawPanel('panel-homo-part',homoPartData,'#8a8580',-0.00003,false,'\u03B2 = \u22120.003 n.s.','Betweenness (within-camp)');
+
+// Homogeneous Moderate: null (Q3 result)
+const homoModData=[{x:.90,y:.00060,e:.00028},{x:.91,y:.00055,e:.00026},{x:.92,y:.00062,e:.00028},{x:.93,y:.00058,e:.00025},{x:.94,y:.00055,e:.00024},{x:.95,y:.00060,e:.00026},{x:.96,y:.00058,e:.00025},{x:.97,y:.00056,e:.00024},{x:.98,y:.00062,e:.00028},{x:.99,y:.00058,e:.00025}];
+drawPanel('panel-homo-mod',homoModData,'#8a8580',-0.0001,false,'\u03B2 = \u22120.027 n.s.','Betweenness');
+</script>
+</body>
+</html>

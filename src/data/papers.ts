@@ -47,7 +47,7 @@ export const papers: Paper[] = [
     status: 'In Progress',
     abstract: 'This paper investigates how network brokers navigate structural barriers in politically divided markets. Drawing on network theory, I examine the conditions under which brokers can bridge ideologically distant communities and the structural features that constrain or enable such brokerage.',
     tags: ['Network Theory', 'Brokerage', 'Structural Barriers'],
-    has_scrollytelling: false,
+    has_scrollytelling: true,
     order: 4,
   },
   {
