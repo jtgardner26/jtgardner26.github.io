@@ -7,6 +7,21 @@ import PaperCard from '../components/ui/PaperCard.astro';
 
 const featuredPapers = papers.filter(p => p.order <= 3);
 
+// Honest quick-facts rail (swap any for advisor / cohort year later)
+const facts = [
+  { value: 'Strategy', label: 'PhD Program' },
+  { value: 'Ross', label: 'School of Business' },
+  { value: 'Michigan', label: 'Ann Arbor, MI' },
+];
+
+// Research areas — the 4-up row under the hero
+const areas = [
+  { title: 'Socio-Political Positioning', desc: 'How firms take public stances on contested social and political issues.' },
+  { title: 'Ideology in Organizations', desc: 'How political ideology shapes behavior and stratification inside firms.' },
+  { title: 'Network Theory', desc: 'Brokerage, structure, and how network position shapes strategic outcomes.' },
+  { title: 'AI & Ethical Decisions', desc: 'How AI systems reason about ethics and high-stakes organizational choices.' },
+];
+
 // CONFIRM with JT: affiliations list
 const affiliations = [
   'University of Michigan · Ross',
@@ -19,7 +34,7 @@ const affiliations = [
 
 <BaseLayout title="Home" description="JT Gardner — Strategy PhD student at Ross School of Business, University of Michigan. Research on ideology in organizations, socio-political positioning, and AI ethics.">
 
-  <!-- ① HERO -->
+  <!-- ① HERO — text · portrait · quick-facts rail -->
   <section class="hero">
     <div class="hero__inner container">
       <div class="hero__text">
@@ -41,6 +56,7 @@ const affiliations = [
           <a href="/cv" class="btn btn--ghost">CV</a>
         </div>
       </div>
+
       <div class="hero__portrait">
         <Image
           src={headshot}
@@ -51,10 +67,31 @@ const affiliations = [
           loading="eager"
         />
       </div>
+
+      <aside class="hero__facts" aria-label="Quick facts">
+        {facts.map(f => (
+          <div class="fact">
+            <span class="fact__value">{f.value}</span>
+            <span class="fact__label">{f.label}</span>
+          </div>
+        ))}
+      </aside>
     </div>
   </section>
 
-  <!-- ② AFFILIATIONS -->
+  <!-- ② RESEARCH AREAS — 4-up feature row -->
+  <section class="areas container" aria-label="Research areas">
+    <div class="areas__grid">
+      {areas.map(a => (
+        <div class="area">
+          <h2 class="area__title">{a.title}</h2>
+          <p class="area__desc">{a.desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ③ AFFILIATIONS -->
   <section class="affiliations container">
     <p class="eyebrow affiliations__label">Affiliations</p>
     <div class="wordmark-row">
@@ -62,7 +99,7 @@ const affiliations = [
     </div>
   </section>
 
-  <!-- ③ ABOUT -->
+  <!-- ④ ABOUT -->
   <section class="about" id="about">
     <div class="container about__inner">
       <div class="about__head">
@@ -86,12 +123,12 @@ const affiliations = [
     </div>
   </section>
 
-  <!-- ④ RESEARCH (dark band) -->
+  <!-- ⑤ RESEARCH (dark band) -->
   <section class="research ink-band">
     <div class="container">
       <div class="research__head">
         <div>
-          <p class="eyebrow">Research</p>
+          <p class="eyebrow">Portfolio</p>
           <h2 class="editorial-title research__title">Featured Work</h2>
         </div>
         <a href="/research" class="research__all">All research →</a>
@@ -104,7 +141,7 @@ const affiliations = [
     </div>
   </section>
 
-  <!-- ⑤ CONTACT -->
+  <!-- ⑥ CONTACT -->
   <section class="contact" id="contact">
     <div class="container container--narrow contact__inner">
       <p class="eyebrow">Contact</p>
@@ -120,19 +157,18 @@ const affiliations = [
 </BaseLayout>
 
 <style>
-  /* ① HERO */
+  /* ① HERO — 3 columns: text · portrait · facts */
   .hero {
-    padding: var(--space-4xl) 0 var(--space-3xl);
+    padding: var(--space-4xl) 0 var(--space-2xl);
   }
   .hero__inner {
     display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: var(--space-3xl);
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 360px) minmax(120px, 160px);
+    gap: var(--space-2xl);
     align-items: center;
-    min-height: calc(100vh - 4.5rem - var(--space-4xl));
   }
   .hero__title {
-    font-size: clamp(2.6rem, 6.2vw, 4.8rem);
+    font-size: clamp(2.4rem, 4.6vw, 4rem);
     margin: var(--space-md) 0 var(--space-xl);
   }
   .hero__lede {
@@ -158,13 +194,68 @@ const affiliations = [
   }
   .hero__portrait { display: flex; justify-content: center; }
   .hero :global(.hero__portrait-img) {
-    width: 360px !important;
+    width: 100% !important;
+    max-width: 360px;
     height: 460px !important;
     object-fit: cover;
     object-position: center top;
   }
+  .hero__facts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    align-self: center;
+  }
+  .fact { display: flex; flex-direction: column; gap: 3px; }
+  .fact__value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text);
+    line-height: 1;
+  }
+  .fact__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
 
-  /* ② AFFILIATIONS */
+  /* ② RESEARCH AREAS */
+  .areas {
+    padding: var(--space-2xl) var(--space-xl) var(--space-3xl);
+    border-top: 1px solid var(--color-border);
+  }
+  .areas__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+  .area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 2px solid var(--color-accent);
+  }
+  .area__title {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text);
+    line-height: var(--leading-tight);
+  }
+  .area__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+  }
+
+  /* ③ AFFILIATIONS */
   .affiliations {
     padding: var(--space-2xl) var(--space-xl);
     border-top: 1px solid var(--color-border);
@@ -172,7 +263,7 @@ const affiliations = [
   }
   .affiliations__label { margin-bottom: var(--space-md); }
 
-  /* ③ ABOUT */
+  /* ④ ABOUT */
   .about {
     background: var(--color-bg-alt);
     padding: var(--space-5xl) 0;
@@ -193,7 +284,7 @@ const affiliations = [
     color: var(--color-text-muted);
   }
 
-  /* ④ RESEARCH */
+  /* ⑤ RESEARCH — enlarged cards */
   .research { padding: var(--space-5xl) 0; }
   .research__head {
     display: flex;
@@ -216,11 +307,13 @@ const affiliations = [
   .research__all:hover { color: var(--color-on-ink); }
   .research__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-xl);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
   }
+  .research__grid :global(.paper-card) { padding: var(--space-2xl); gap: var(--space-md); }
+  .research__grid :global(.paper-card__title) { font-size: var(--text-2xl); }
 
-  /* ⑤ CONTACT */
+  /* ⑥ CONTACT */
   .contact { padding: var(--space-5xl) 0 var(--space-4xl); }
   .contact__title {
     font-size: clamp(2.4rem, 5vw, 4rem);
@@ -246,10 +339,26 @@ const affiliations = [
   }
 
   /* RESPONSIVE */
-  @media (max-width: 900px) {
-    .hero__inner { grid-template-columns: 1fr; gap: var(--space-2xl); min-height: 0; }
+  @media (max-width: 1024px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    }
+    .hero__facts {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-2xl);
+      align-self: start;
+    }
+    .areas__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-lg) var(--space-xl); }
+  }
+
+  @media (max-width: 760px) {
+    .hero__inner { grid-template-columns: 1fr; gap: var(--space-xl); min-height: 0; }
     .hero__portrait { order: -1; }
-    .hero :global(.hero__portrait-img) { width: 260px !important; height: 330px !important; }
+    .hero :global(.hero__portrait-img) { max-width: 260px; height: 330px !important; }
+    .hero__facts { gap: var(--space-lg) var(--space-2xl); }
+    .areas__grid { grid-template-columns: 1fr; }
     .about__inner { grid-template-columns: 1fr; gap: var(--space-lg); }
     .research__head { flex-direction: column; align-items: flex-start; }
   }
