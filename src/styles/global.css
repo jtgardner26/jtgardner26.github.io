@@ -1,7 +1,7 @@
 /* ===== DESIGN TOKENS ===== */
 :root {
-  /* Palette — warm cream + ink, clay accent.
-     Fallback (previous dusty-blue): accent #4E6E8E / deep #3C5876 */
+  /* Palette — warm cream + ink, blue accent.
+     Fallback (previous clay): accent #C2673F / deep #A8542F / on-ink #D98A5E */
   --color-bg: #F3EFE7;
   --color-bg-alt: #EAE4D8;
   --color-bg-warm: #F6F1E8;
@@ -9,11 +9,11 @@
   --color-on-ink: #EDE8DF;
   --color-text: #211E1A;
   --color-text-muted: #6B655C;
-  --color-accent: #C2673F;
-  --color-accent-hover: #A8542F;
-  --color-accent-deep: #A8542F;
-  --color-accent-on-ink: #D98A5E;
-  --color-accent-light: rgba(194, 103, 63, 0.10);
+  --color-accent: #2E6BAA;
+  --color-accent-hover: #234F7A;
+  --color-accent-deep: #234F7A;
+  --color-accent-on-ink: #7CACDD;
+  --color-accent-light: rgba(46, 107, 170, 0.10);
   --color-secondary: #4E6E8E;
   --color-secondary-hover: #3C5876;
   --color-secondary-light: rgba(78, 110, 142, 0.12);
