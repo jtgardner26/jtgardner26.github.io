@@ -2,10 +2,11 @@
 const currentPath = Astro.url.pathname;
 
 const links = [
-  { href: '/', label: 'Home' },
+  { href: '/#about', label: 'About' },
   { href: '/research', label: 'Research' },
   { href: '/consulting', label: 'Consulting' },
   { href: '/cv', label: 'CV' },
+  { href: '/#contact', label: 'Contact' },
 ];
 ---
 
@@ -44,6 +45,7 @@ const links = [
 </header>
 
 <script>
+  const nav = document.querySelector('.nav');
   const toggle = document.querySelector('.nav__toggle');
   const menu = document.querySelector('.nav__menu');
 
@@ -52,6 +54,10 @@ const links = [
     toggle.setAttribute('aria-expanded', String(!expanded));
     menu?.classList.toggle('nav__menu--open');
   });
+
+  const onScroll = () => nav?.classList.toggle('nav--scrolled', window.scrollY > 12);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
 </script>
 
 <style>
@@ -59,10 +65,15 @@ const links = [
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(244, 246, 249, 0.8);
+    background: rgba(243, 239, 231, 0.72);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(30, 58, 74, 0.06);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+  }
+  .nav--scrolled {
+    background: rgba(243, 239, 231, 0.88);
+    border-bottom-color: var(--color-border);
   }
 
   .nav__inner {
@@ -112,8 +123,10 @@ const links = [
   }
 
   .nav__link--active {
-    color: var(--color-accent);
-    background: var(--color-accent-light);
+    color: var(--color-text);
+    background: transparent;
+    box-shadow: inset 0 -2px 0 var(--color-accent);
+    border-radius: 0;
   }
 
   .nav__toggle {
