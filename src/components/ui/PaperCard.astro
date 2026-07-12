@@ -4,12 +4,13 @@ import Tag from './Tag.astro';
 
 interface Props {
   paper: Paper;
+  variant?: 'default' | 'dark';
 }
 
-const { paper } = Astro.props;
+const { paper, variant = 'default' } = Astro.props;
 ---
 
-<article class="paper-card card">
+<article class:list={['paper-card', 'card', { 'paper-card--dark': variant === 'dark' }]}>
   <div class="paper-card__header">
     <span class="label">{paper.status}</span>
     {paper.has_scrollytelling && <span class="paper-card__badge">Interactive</span>}
@@ -86,5 +87,23 @@ const { paper } = Astro.props;
     gap: var(--space-xs);
     margin-top: auto;
     padding-top: var(--space-sm);
+  }
+
+  .paper-card--dark {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(237, 232, 223, 0.14);
+    backdrop-filter: none;
+  }
+  .paper-card--dark:hover {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+  .paper-card--dark .paper-card__title a { color: var(--color-on-ink); }
+  .paper-card--dark .paper-card__title a:hover { color: var(--color-accent-on-ink); }
+  .paper-card--dark .paper-card__authors,
+  .paper-card--dark .paper-card__abstract { color: rgba(237, 232, 223, 0.65); }
+  .paper-card--dark .label { color: var(--color-accent-on-ink); }
+  .paper-card--dark .paper-card__badge {
+    background: rgba(217, 138, 94, 0.18);
+    color: var(--color-accent-on-ink);
   }
 </style>
